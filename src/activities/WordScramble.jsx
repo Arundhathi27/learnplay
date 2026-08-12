@@ -15,11 +15,13 @@ const shuffleWordLetters = (word) => {
   const letters = word.split('');
   let shuffled = [...letters];
 
+  // Fisher-Yates Shuffle
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
+  // Ensure shuffled string doesn't match original word initially
   if (shuffled.join('') === word && word.length > 2) {
     return shuffleWordLetters(word);
   }
@@ -44,6 +46,7 @@ export default function WordScramble({ onBack }) {
   const maxScore = totalQuestions * 10;
   const currentWordObj = WORDS_DATA[currentIndex];
 
+  // Reset & shuffle tiles when moving to a new word
   useEffect(() => {
     if (!isCompleted && currentWordObj) {
       setTiles(shuffleWordLetters(currentWordObj.word));
@@ -56,18 +59,24 @@ export default function WordScramble({ onBack }) {
   const handleTileClick = (tile) => {
     if (tile.isUsed || isCorrect) return;
 
+    // Mark tile as used
     setTiles((prev) =>
       prev.map((t) => (t.tileId === tile.tileId ? { ...t, isUsed: true } : t))
     );
+
+    // Add to answer area
     setSelectedTiles((prev) => [...prev, tile]);
   };
 
   const handleRemoveSelectedTile = (tileToRemove) => {
     if (isCorrect) return;
 
+    // Remove from answer area
     setSelectedTiles((prev) =>
       prev.filter((t) => t.tileId !== tileToRemove.tileId)
     );
+
+    // Make original tile available again
     setTiles((prev) =>
       prev.map((t) => (t.tileId === tileToRemove.tileId ? { ...t, isUsed: false } : t))
     );
@@ -81,6 +90,7 @@ export default function WordScramble({ onBack }) {
 
   const handleClearAll = () => {
     if (selectedTiles.length === 0 || isCorrect) return;
+
     setSelectedTiles([]);
     setTiles((prev) => prev.map((t) => ({ ...t, isUsed: false })));
   };
@@ -96,12 +106,12 @@ export default function WordScramble({ onBack }) {
       setScore((prev) => prev + 10);
       setFeedback({
         type: 'success',
-        message: `🎉 Correct! You unscrambled "${currentWordObj.word}". (+10 pts)`
+        message: `🎉 Correct! You unscrambled "${currentWordObj.word}"!`
       });
     } else {
       setFeedback({
         type: 'error',
-        message: '❌ Not quite! Check letter order and try again.'
+        message: '❌ Not quite! Try again.'
       });
     }
   };
@@ -128,157 +138,176 @@ export default function WordScramble({ onBack }) {
     const percentage = Math.round((score / maxScore) * 100);
 
     return (
-      <div className="activity-page-wrapper theme-coral">
-        <div className="activity-container">
-          <button type="button" className="btn-back-pill" onClick={onBack}>
+      <div className="activity-container">
+        <div className="activity-header">
+          <button type="button" className="btn-back" onClick={onBack}>
             ← Back to Activities
           </button>
+        </div>
 
-          <div className="game-card results-card">
-            <div className="results-badge-icon">🔤</div>
-            <h1 className="results-title">Word Scramble Completed!</h1>
-            <p className="results-subtitle">Amazing vocabulary skills! You unscrambled all 8 target words.</p>
+        <div className="scramble-card results-card">
+          <div className="result-icon">🏆</div>
+          <h1 className="result-title">Word Master!</h1>
+          <p className="result-subtitle">You unscrambled all 8 vocabulary words!</p>
 
-            <div className="score-summary-banner">
-              <div className="score-main-value">{score} <span className="score-max-value">/ {maxScore}</span></div>
-              <div className="score-percent-badge">{percentage}% Accuracy</div>
+          <div className="score-summary-box">
+            <div className="score-main">
+              <span className="score-value">{score}</span>
+              <span className="score-max">/ {maxScore}</span>
             </div>
-
-            <div className="results-actions-row">
-              <button type="button" className="btn btn-activity-action theme-coral" onClick={handlePlayAgain}>
-                Play Again 🔄
-              </button>
-              <button type="button" className="btn btn-secondary-action" onClick={onBack}>
-                Back to Activities
-              </button>
+            <div className="score-percentage-badge">
+              {percentage}% Accuracy
             </div>
+          </div>
+
+          <div className="result-actions">
+            <button type="button" className="btn btn-primary" onClick={handlePlayAgain}>
+              🔄 Play Again
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>
+              ← Back to Activities
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  const currentAnswerString = selectedTiles.map((t) => t.char).join('');
+
   return (
-    <div className="activity-page-wrapper theme-coral">
-      <div className="activity-container">
-        <button type="button" className="btn-back-pill" onClick={onBack}>
+    <div className="activity-container">
+      <div className="activity-header">
+        <button type="button" className="btn-back" onClick={onBack}>
           ← Back to Activities
         </button>
+      </div>
 
-        <div className="game-card">
-          {/* Header */}
-          <div className="game-header-bar">
-            <div className="game-title-group">
-              <span className="game-header-icon">🔤</span>
-              <div>
-                <h1 className="game-main-title">Word Scramble</h1>
-                <p className="game-instruction">Arrange the letters to make the correct word.</p>
-              </div>
-            </div>
-
-            <div className="game-stats-pills">
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">QUESTION</span>
-                <span className="stat-pill-value">{currentIndex + 1} / {totalQuestions}</span>
-              </div>
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">LEVEL</span>
-                <span className="stat-pill-value">{currentWordObj.difficulty}</span>
-              </div>
-              <div className="stat-pill-badge stat-score">
-                <span className="stat-pill-label">SCORE</span>
-                <span className="stat-pill-value">{score}</span>
-              </div>
-            </div>
+      <div className="scramble-card">
+        {/* Game Header Bar */}
+        <div className="game-header">
+          <div className="activity-title-group">
+            <h1 className="activity-main-title">🔤 Unscramble It!</h1>
+            <p className="activity-instruction">Arrange the letters to make the correct word.</p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="progress-bar-track">
-            <div
-              className="progress-bar-fill theme-coral"
-              style={{ width: `${((currentIndex + (isCorrect ? 1 : 0)) / totalQuestions) * 100}%` }}
-            ></div>
-          </div>
-
-          {feedback && (
-            <div className={`activity-feedback-banner feedback-${feedback.type}`} role="alert">
-              {feedback.message}
+          <div className="game-stats">
+            <div className="stat-pill">
+              <span className="stat-label">Question</span>
+              <span className="stat-value">{currentIndex + 1} / {totalQuestions}</span>
             </div>
-          )}
-
-          {/* Answer Drop Area */}
-          <div className="scramble-answer-container">
-            <div className="answer-header-line">
-              <span className="area-title">Your Answer:</span>
-              {selectedTiles.length > 0 && !isCorrect && (
-                <div className="scramble-quick-actions">
-                  <button type="button" className="btn-text-link" onClick={handleRemoveLast}>
-                    ↩ Remove Last
-                  </button>
-                  <button type="button" className="btn-text-link" onClick={handleClearAll}>
-                    Clear All
-                  </button>
-                </div>
-              )}
+            <div className="stat-pill">
+              <span className="stat-label">Difficulty</span>
+              <span className={`difficulty-tag difficulty-${currentWordObj.difficulty.toLowerCase()}`}>
+                {currentWordObj.difficulty}
+              </span>
             </div>
-
-            <div className={`scramble-answer-display ${isCorrect ? 'answer-success' : ''}`}>
-              {selectedTiles.length === 0 ? (
-                <span className="empty-answer-hint">Click letter tiles below to form the word</span>
-              ) : (
-                selectedTiles.map((tile, idx) => (
-                  <button
-                    key={`ans_${tile.tileId}_${idx}`}
-                    type="button"
-                    className="scramble-letter-tile answer-tile"
-                    onClick={() => handleRemoveSelectedTile(tile)}
-                    disabled={isCorrect}
-                  >
-                    {tile.char}
-                  </button>
-                ))
-              )}
+            <div className="stat-pill stat-score">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">{score}</span>
             </div>
           </div>
+        </div>
 
-          {/* Available Letters Pool */}
-          <div className="scramble-available-pool">
-            <span className="pool-heading">Click letters in order:</span>
-            <div className="scramble-letters-grid">
-              {tiles.map((tile) => (
+        {/* Progress Bar */}
+        <div className="progress-bar-track">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${((currentIndex + (isCorrect ? 1 : 0)) / totalQuestions) * 100}%` }}
+          ></div>
+        </div>
+
+        {/* Feedback Display */}
+        {feedback && (
+          <div className={`dictation-feedback feedback-${feedback.type}`} role="alert">
+            {feedback.message}
+          </div>
+        )}
+
+        {/* Answer Display Area */}
+        <div className="answer-section">
+          <div className="answer-section-header">
+            <span className="answer-section-label">Your Answer:</span>
+            {selectedTiles.length > 0 && !isCorrect && (
+              <div className="answer-actions">
                 <button
-                  key={tile.tileId}
                   type="button"
-                  className={`scramble-letter-tile ${tile.isUsed ? 'used-tile' : ''}`}
-                  onClick={() => handleTileClick(tile)}
-                  disabled={tile.isUsed || isCorrect}
+                  className="btn-text-action"
+                  onClick={handleRemoveLast}
+                >
+                  ↩ Remove Last
+                </button>
+                <button
+                  type="button"
+                  className="btn-text-action"
+                  onClick={handleClearAll}
+                >
+                  🧹 Clear All
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className={`answer-tiles-box ${isCorrect ? 'answer-correct' : ''}`}>
+            {selectedTiles.length === 0 ? (
+              <span className="answer-placeholder">Click letter tiles below to build the word</span>
+            ) : (
+              selectedTiles.map((tile, idx) => (
+                <button
+                  key={`ans_${tile.tileId}_${idx}`}
+                  type="button"
+                  className="letter-tile answer-tile"
+                  onClick={() => handleRemoveSelectedTile(tile)}
+                  disabled={isCorrect}
+                  aria-label={`Remove letter ${tile.char}`}
+                  title="Click to remove letter"
                 >
                   {tile.char}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-action-row">
-            {!isCorrect ? (
-              <button
-                type="button"
-                className="btn btn-activity-action theme-coral"
-                onClick={handleCheckAnswer}
-                disabled={selectedTiles.length === 0}
-              >
-                Check Answer
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="btn btn-activity-action theme-coral"
-                onClick={handleNextQuestion}
-              >
-                {currentIndex < totalQuestions - 1 ? 'Next Word →' : 'See Results'}
-              </button>
+              ))
             )}
           </div>
+        </div>
+
+        {/* Available Shuffled Letter Tiles Section */}
+        <div className="available-tiles-section">
+          <span className="tiles-section-label">Click letters in order:</span>
+          <div className="available-tiles-grid">
+            {tiles.map((tile) => (
+              <button
+                key={tile.tileId}
+                type="button"
+                className={`letter-tile ${tile.isUsed ? 'used' : ''}`}
+                onClick={() => handleTileClick(tile)}
+                disabled={tile.isUsed || isCorrect}
+                aria-label={`Select letter ${tile.char}`}
+              >
+                {tile.char}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Form Action Controls */}
+        <div className="scramble-actions">
+          {!isCorrect ? (
+            <button
+              type="button"
+              className="btn btn-primary btn-check"
+              onClick={handleCheckAnswer}
+              disabled={selectedTiles.length === 0}
+            >
+              Check Answer
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary btn-next"
+              onClick={handleNextQuestion}
+            >
+              {currentIndex < totalQuestions - 1 ? 'Next Word ➔' : 'See Results 🏆'}
+            </button>
+          )}
         </div>
       </div>
     </div>

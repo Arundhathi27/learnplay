@@ -53,6 +53,7 @@ const createShuffledCards = (roundIndex) => {
     });
   });
 
+  // Fisher-Yates shuffle
   for (let i = cardDeck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
@@ -71,7 +72,7 @@ export default function MemoryGame({ onBack }) {
   const [isCompleted, setIsCompleted] = useState(false);
 
   const totalRounds = ROUNDS_DATA.length;
-  const totalPairsGame = 12;
+  const totalPairsGame = 12; // 3 rounds * 4 pairs
   const maxScore = totalPairsGame * 10;
 
   const matchedInRound = cards.filter((c) => c.isMatched).length / 2;
@@ -80,6 +81,7 @@ export default function MemoryGame({ onBack }) {
   const completedPreviousPairs = currentRoundIndex * 4;
   const totalMatchedPairs = completedPreviousPairs + matchedInRound;
 
+  // Initialize cards on round change
   useEffect(() => {
     setCards(createShuffledCards(currentRoundIndex));
     setFlippedCards([]);
@@ -97,6 +99,7 @@ export default function MemoryGame({ onBack }) {
       return;
     }
 
+    // Flip clicked card
     const updatedCards = cards.map((c) =>
       c.id === clickedCard.id ? { ...c, isFlipped: true } : c
     );
@@ -105,11 +108,13 @@ export default function MemoryGame({ onBack }) {
     const newFlipped = [...flippedCards, clickedCard];
     setFlippedCards(newFlipped);
 
+    // If two cards are now flipped, check match
     if (newFlipped.length === 2) {
       const [firstCard, secondCard] = newFlipped;
       setIsChecking(true);
 
       if (firstCard.pairId === secondCard.pairId) {
+        // MATCH!
         setScore((prev) => prev + 10);
         setCards((prev) =>
           prev.map((c) =>
@@ -118,14 +123,15 @@ export default function MemoryGame({ onBack }) {
         );
         setFeedback({
           type: 'success',
-          message: `🎉 Match found! "${firstCard.name}" pair! (+10 pts)`
+          message: `🎉 Match! "${firstCard.name}" pair found!`
         });
         setFlippedCards([]);
         setIsChecking(false);
       } else {
+        // NO MATCH
         setFeedback({
           type: 'error',
-          message: '❌ Not a match! Try to remember where they were.'
+          message: '❌ Not a match!'
         });
 
         setTimeout(() => {
@@ -165,30 +171,35 @@ export default function MemoryGame({ onBack }) {
     const percentage = Math.round((score / maxScore) * 100);
 
     return (
-      <div className="activity-page-wrapper theme-teal">
-        <div className="activity-container">
-          <button type="button" className="btn-back-pill" onClick={onBack}>
+      <div className="activity-container">
+        <div className="activity-header">
+          <button type="button" className="btn-back" onClick={onBack}>
             ← Back to Activities
           </button>
+        </div>
 
-          <div className="game-card results-card">
-            <div className="results-badge-icon">🧠</div>
-            <h1 className="results-title">Memory Match Completed!</h1>
-            <p className="results-subtitle">Fantastic memory! You matched all 12 pairs across 3 rounds.</p>
+        <div className="memory-card results-card">
+          <div className="result-icon">🏆</div>
+          <h1 className="result-title">Memory Master!</h1>
+          <p className="result-subtitle">You matched all {totalPairsGame} pairs across all 3 rounds!</p>
 
-            <div className="score-summary-banner">
-              <div className="score-main-value">{score} <span className="score-max-value">/ {maxScore}</span></div>
-              <div className="score-percent-badge">{percentage}% Accuracy</div>
+          <div className="score-summary-box">
+            <div className="score-main">
+              <span className="score-value">{score}</span>
+              <span className="score-max">/ {maxScore}</span>
             </div>
-
-            <div className="results-actions-row">
-              <button type="button" className="btn btn-activity-action theme-teal" onClick={handlePlayAgain}>
-                Play Again 🔄
-              </button>
-              <button type="button" className="btn btn-secondary-action" onClick={onBack}>
-                Back to Activities
-              </button>
+            <div className="score-percentage-badge">
+              {percentage}% Accuracy ({totalMatchedPairs} / {totalPairsGame} Pairs)
             </div>
+          </div>
+
+          <div className="result-actions">
+            <button type="button" className="btn btn-primary" onClick={handlePlayAgain}>
+              🔄 Play Again
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>
+              ← Back to Activities
+            </button>
           </div>
         </div>
       </div>
@@ -196,95 +207,102 @@ export default function MemoryGame({ onBack }) {
   }
 
   return (
-    <div className="activity-page-wrapper theme-teal">
-      <div className="activity-container">
-        <button type="button" className="btn-back-pill" onClick={onBack}>
+    <div className="activity-container">
+      <div className="activity-header">
+        <button type="button" className="btn-back" onClick={onBack}>
           ← Back to Activities
         </button>
+      </div>
 
-        <div className="game-card">
-          {/* Header */}
-          <div className="game-header-bar">
-            <div className="game-title-group">
-              <span className="game-header-icon">🧠</span>
-              <div>
-                <h1 className="game-main-title">Memory Match</h1>
-                <p className="game-instruction">Flip cards and find matching pairs.</p>
-              </div>
-            </div>
-
-            <div className="game-stats-pills">
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">ROUND</span>
-                <span className="stat-pill-value">{currentRoundIndex + 1} / {totalRounds}</span>
-              </div>
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">MATCHES</span>
-                <span className="stat-pill-value">{matchedInRound} / 4</span>
-              </div>
-              <div className="stat-pill-badge stat-score">
-                <span className="stat-pill-label">SCORE</span>
-                <span className="stat-pill-value">{score}</span>
-              </div>
-            </div>
+      <div className="memory-card">
+        {/* Game Header Bar */}
+        <div className="game-header">
+          <div className="activity-title-group">
+            <h1 className="activity-main-title">🧠 Match the Pairs</h1>
+            <p className="activity-instruction">Flip two cards to find matching pairs.</p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="progress-bar-track">
-            <div
-              className="progress-bar-fill theme-teal"
-              style={{ width: `${(totalMatchedPairs / totalPairsGame) * 100}%` }}
-            ></div>
+          <div className="game-stats">
+            <div className="stat-pill">
+              <span className="stat-label">Round</span>
+              <span className="stat-value">{currentRoundIndex + 1} / {totalRounds}</span>
+            </div>
+            <div className="stat-pill">
+              <span className="stat-label">Matches</span>
+              <span className="stat-value">{matchedInRound} / 4</span>
+            </div>
+            <div className="stat-pill stat-score">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">{score}</span>
+            </div>
           </div>
+        </div>
 
-          {feedback && (
-            <div className={`activity-feedback-banner feedback-${feedback.type}`} role="alert">
-              {feedback.message}
+        {/* Progress Bar (Overall Pairs Matched: 12 Total) */}
+        <div className="progress-bar-track">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${(totalMatchedPairs / totalPairsGame) * 100}%` }}
+          ></div>
+        </div>
+
+        {/* Feedback Display */}
+        {feedback && (
+          <div className={`dictation-feedback feedback-${feedback.type}`} role="alert">
+            {feedback.message}
+          </div>
+        )}
+
+        {/* Round Complete Action Banner */}
+        {isRoundComplete && (
+          <div className="round-complete-box">
+            <div className="round-complete-info">
+              <h2>🎉 Round {currentRoundIndex + 1} Complete!</h2>
+              <p>You matched all 4 pairs in this round!</p>
             </div>
-          )}
+            <button
+              type="button"
+              className="btn btn-primary btn-next-round"
+              onClick={handleNextRound}
+            >
+              {currentRoundIndex < totalRounds - 1 ? 'Next Round ➔' : 'See Final Results 🏆'}
+            </button>
+          </div>
+        )}
 
-          {isRoundComplete && (
-            <div className="round-complete-banner theme-teal">
-              <div>
-                <h2 className="banner-title">Round {currentRoundIndex + 1} Complete!</h2>
-                <p className="banner-subtitle">You matched all 4 pairs for this round!</p>
-              </div>
-              <button type="button" className="btn btn-activity-action theme-teal" onClick={handleNextRound}>
-                {currentRoundIndex < totalRounds - 1 ? 'Next Round →' : 'See Results'}
-              </button>
-            </div>
-          )}
+        {/* Cards Grid */}
+        <div className="memory-grid">
+          {cards.map((card) => {
+            const isFlipped = card.isFlipped || card.isMatched;
+            const cardLabel = isFlipped ? `${card.name} card` : 'Hidden card';
 
-          {/* 3D Cards Grid */}
-          <div className="memory-board-grid">
-            {cards.map((card) => {
-              const isFlipped = card.isFlipped || card.isMatched;
-
-              return (
-                <button
-                  key={card.id}
-                  type="button"
-                  className={`memory-card-box ${isFlipped ? 'flipped' : ''} ${
-                    card.isMatched ? 'matched' : ''
-                  }`}
-                  onClick={() => handleCardClick(card)}
-                  disabled={card.isMatched || isChecking}
-                  aria-label={isFlipped ? `${card.name} card` : 'Hidden memory card'}
-                >
-                  <div className="card-flipper">
-                    <div className="card-face-front">
-                      <span className="front-question">?</span>
-                    </div>
-                    <div className="card-face-back">
-                      <span className="back-emoji-display">{card.emoji}</span>
-                      <span className="back-name-display">{card.name}</span>
-                      {card.isMatched && <span className="matched-check-badge">✓</span>}
-                    </div>
+            return (
+              <button
+                key={card.id}
+                type="button"
+                className={`memory-card-item ${isFlipped ? 'flipped' : ''} ${
+                  card.isMatched ? 'matched' : ''
+                }`}
+                onClick={() => handleCardClick(card)}
+                disabled={card.isMatched || isChecking}
+                aria-label={cardLabel}
+              >
+                <div className="card-inner">
+                  {/* Card Front (Face Down) */}
+                  <div className="card-face card-front">
+                    <span className="card-question-mark">?</span>
                   </div>
-                </button>
-              );
-            })}
-          </div>
+
+                  {/* Card Back (Face Up) */}
+                  <div className="card-face card-back">
+                    <span className="card-emoji">{card.emoji}</span>
+                    <span className="card-name">{card.name}</span>
+                    {card.isMatched && <span className="matched-badge">✅</span>}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

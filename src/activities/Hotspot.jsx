@@ -58,10 +58,11 @@ export default function Hotspot({ onBack }) {
 
   const currentScene = SCENES[currentRoundIndex];
   const totalRounds = SCENES.length;
-  const maxScore = 90;
+  const maxScore = 90; // 9 targets total * 10 pts
 
   const targetCountInRound = currentScene.objects.filter((o) => o.isCorrect).length;
   const isRoundComplete = foundIds.length === targetCountInRound;
+
   const totalFoundCount = currentRoundIndex * 3 + foundIds.length;
 
   const handleObjectClick = (obj) => {
@@ -74,21 +75,22 @@ export default function Hotspot({ onBack }) {
         if (updated.length === targetCountInRound) {
           setFeedback({
             type: 'success',
-            message: `🎉 Great observation! You found all items in the ${currentScene.title}!`
+            message: `🎉 All items found in ${currentScene.title}! Great job!`
           });
         } else {
           setFeedback({
             type: 'success',
-            message: `🎉 Correct! "${obj.name}" is a target object! (+10 pts)`
+            message: `🎉 Found it! "${obj.name}" is correct!`
           });
         }
       }
     } else {
+      // Incorrect distractor clicked
       setShakingId(obj.id);
       setTimeout(() => setShakingId(null), 500);
       setFeedback({
         type: 'error',
-        message: "❌ That's not what we're looking for! Keep searching."
+        message: "❌ That's not what we're looking for!"
       });
     }
   };
@@ -116,30 +118,35 @@ export default function Hotspot({ onBack }) {
     const percentage = Math.round((score / maxScore) * 100);
 
     return (
-      <div className="activity-page-wrapper theme-amber">
-        <div className="activity-container">
-          <button type="button" className="btn-back-pill" onClick={onBack}>
+      <div className="activity-container">
+        <div className="activity-header">
+          <button type="button" className="btn-back" onClick={onBack}>
             ← Back to Activities
           </button>
+        </div>
 
-          <div className="game-card results-card">
-            <div className="results-badge-icon">🔎</div>
-            <h1 className="results-title">Find the Objects Completed!</h1>
-            <p className="results-subtitle">Super visual skills! You found all hidden target objects.</p>
+        <div className="hotspot-card results-card">
+          <div className="result-icon">🏆</div>
+          <h1 className="result-title">Amazing!</h1>
+          <p className="result-subtitle">You found all the hidden objects!</p>
 
-            <div className="score-summary-banner">
-              <div className="score-main-value">{score} <span className="score-max-value">/ {maxScore}</span></div>
-              <div className="score-percent-badge">{percentage}% Accuracy</div>
+          <div className="score-summary-box">
+            <div className="score-main">
+              <span className="score-value">{score}</span>
+              <span className="score-max">/ {maxScore}</span>
             </div>
-
-            <div className="results-actions-row">
-              <button type="button" className="btn btn-activity-action theme-amber" onClick={handlePlayAgain}>
-                Play Again 🔄
-              </button>
-              <button type="button" className="btn btn-secondary-action" onClick={onBack}>
-                Back to Activities
-              </button>
+            <div className="score-percentage-badge">
+              {percentage}% Accuracy
             </div>
+          </div>
+
+          <div className="result-actions">
+            <button type="button" className="btn btn-primary" onClick={handlePlayAgain}>
+              🔄 Play Again
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>
+              ← Back to Activities
+            </button>
           </div>
         </div>
       </div>
@@ -147,93 +154,97 @@ export default function Hotspot({ onBack }) {
   }
 
   return (
-    <div className="activity-page-wrapper theme-amber">
-      <div className="activity-container">
-        <button type="button" className="btn-back-pill" onClick={onBack}>
+    <div className="activity-container">
+      <div className="activity-header">
+        <button type="button" className="btn-back" onClick={onBack}>
           ← Back to Activities
         </button>
+      </div>
 
-        <div className="game-card">
-          {/* Header */}
-          <div className="game-header-bar">
-            <div className="game-title-group">
-              <span className="game-header-icon">🔎</span>
-              <div>
-                <h1 className="game-main-title">Find the Objects</h1>
-                <p className="game-instruction">
-                  Scene {currentRoundIndex + 1}: <strong>{currentScene.title}</strong> — {currentScene.instruction}
-                </p>
-              </div>
-            </div>
-
-            <div className="game-stats-pills">
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">SCENE</span>
-                <span className="stat-pill-value">{currentRoundIndex + 1} / {totalRounds}</span>
-              </div>
-              <div className="stat-pill-badge">
-                <span className="stat-pill-label">FOUND</span>
-                <span className="stat-pill-value">{foundIds.length} / {targetCountInRound}</span>
-              </div>
-              <div className="stat-pill-badge stat-score">
-                <span className="stat-pill-label">SCORE</span>
-                <span className="stat-pill-value">{score}</span>
-              </div>
-            </div>
+      <div className="hotspot-card">
+        {/* Game Header Bar */}
+        <div className="game-header">
+          <div className="activity-title-group">
+            <h1 className="activity-main-title">🔎 Find the Hidden Objects</h1>
+            <p className="activity-instruction">
+              Scene {currentRoundIndex + 1}: <strong>{currentScene.title}</strong> — {currentScene.instruction}
+            </p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="progress-bar-track">
-            <div
-              className="progress-bar-fill theme-amber"
-              style={{ width: `${(totalFoundCount / 9) * 100}%` }}
-            ></div>
-          </div>
-
-          {feedback && (
-            <div className={`activity-feedback-banner feedback-${feedback.type}`} role="alert">
-              {feedback.message}
+          <div className="game-stats">
+            <div className="stat-pill">
+              <span className="stat-label">Round</span>
+              <span className="stat-value">{currentRoundIndex + 1} / {totalRounds}</span>
             </div>
-          )}
+            <div className="stat-pill">
+              <span className="stat-label">Found</span>
+              <span className="stat-value">{foundIds.length} / {targetCountInRound}</span>
+            </div>
+            <div className="stat-pill stat-score">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">{score}</span>
+            </div>
+          </div>
+        </div>
 
-          {isRoundComplete && (
-            <div className="round-complete-banner theme-amber">
-              <div>
-                <h2 className="banner-title">Scene {currentRoundIndex + 1} Complete!</h2>
-                <p className="banner-subtitle">You found all 3 target objects in the {currentScene.title}!</p>
-              </div>
-              <button type="button" className="btn btn-activity-action theme-amber" onClick={handleNextRound}>
-                {currentRoundIndex < totalRounds - 1 ? 'Next Scene →' : 'See Results'}
+        {/* Progress Bar (Overall Game Progress: 9 total targets) */}
+        <div className="progress-bar-track">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${(totalFoundCount / 9) * 100}%` }}
+          ></div>
+        </div>
+
+        {/* Feedback Display */}
+        {feedback && (
+          <div className={`dictation-feedback feedback-${feedback.type}`} role="alert">
+            {feedback.message}
+          </div>
+        )}
+
+        {/* Round Complete Action Banner */}
+        {isRoundComplete && (
+          <div className="round-complete-box">
+            <div className="round-complete-info">
+              <h2>🎉 Round {currentRoundIndex + 1} Complete!</h2>
+              <p>You found all 3 targets in the {currentScene.title}!</p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-next-round"
+              onClick={handleNextRound}
+            >
+              {currentRoundIndex < totalRounds - 1 ? 'Next Round ➔' : 'See Final Results 🏆'}
+            </button>
+          </div>
+        )}
+
+        {/* Interactive Visual Scene Container */}
+        <div className={`hotspot-scene-container ${currentScene.bgClass}`}>
+          <div className="scene-watermark-title">{currentScene.title}</div>
+
+          {currentScene.objects.map((obj) => {
+            const isFound = foundIds.includes(obj.id);
+            const isShaking = shakingId === obj.id;
+
+            return (
+              <button
+                key={obj.id}
+                type="button"
+                className={`scene-hotspot-item ${isFound ? 'found' : ''} ${
+                  isShaking ? 'shake' : ''
+                }`}
+                style={{ top: obj.top, left: obj.left }}
+                onClick={() => handleObjectClick(obj)}
+                aria-label={`${obj.name}${isFound ? ' (Found)' : ''}`}
+                title={obj.name}
+              >
+                <span className="hotspot-emoji">{obj.emoji}</span>
+                <span className="hotspot-label">{obj.name}</span>
+                {isFound && <span className="found-checkmark">✅</span>}
               </button>
-            </div>
-          )}
-
-          {/* Interactive Scene Area */}
-          <div className={`hotspot-scene-frame ${currentScene.bgClass}`}>
-            <span className="scene-watermark">{currentScene.title}</span>
-
-            {currentScene.objects.map((obj) => {
-              const isFound = foundIds.includes(obj.id);
-              const isShaking = shakingId === obj.id;
-
-              return (
-                <button
-                  key={obj.id}
-                  type="button"
-                  className={`hotspot-badge-btn ${isFound ? 'found-target' : ''} ${
-                    isShaking ? 'shake-distractor' : ''
-                  }`}
-                  style={{ top: obj.top, left: obj.left }}
-                  onClick={() => handleObjectClick(obj)}
-                  aria-label={`${obj.name}${isFound ? ' (Found)' : ''}`}
-                >
-                  <span className="badge-emoji">{obj.emoji}</span>
-                  <span className="badge-label">{obj.name}</span>
-                  {isFound && <span className="badge-check">✓</span>}
-                </button>
-              );
-            })}
-          </div>
+            );
+          })}
         </div>
       </div>
     </div>

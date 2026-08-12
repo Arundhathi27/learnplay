@@ -1,59 +1,44 @@
-// Data configuration matching exact LearnPlay template design
+// Data configuration for LearnPlay interactive activities
 
 export const ACTIVITIES = [
   {
     id: 'dictation',
-    number: '01',
     title: 'Dictation',
-    subtitle: 'Listen carefully and type what you hear.',
+    icon: '🎧',
     description: 'Listen carefully and type what you hear.',
-    difficulty: 'EASY',
-    theme: 'purple',
-    accentColor: '#6366f1',
-    bgColor: '#eef2ff'
+    difficulty: 'Easy',
+    color: '#4f46e5' // Indigo accent
   },
   {
     id: 'drag-drop',
-    number: '02',
-    title: 'Sort & Match',
-    subtitle: 'Drag items into the correct category.',
-    description: 'Drag items into the correct category.',
-    difficulty: 'EASY',
-    theme: 'blue',
-    accentColor: '#0284c7',
-    bgColor: '#e0f2fe'
+    title: 'Drag & Drop',
+    icon: '🧩',
+    description: 'Drag each item to the correct place.',
+    difficulty: 'Easy',
+    color: '#059669' // Emerald accent
   },
   {
     id: 'multiple-hotspot',
-    number: '03',
-    title: 'Find the Objects',
-    subtitle: 'Explore the scene and find hidden objects.',
-    description: 'Explore the scene and find hidden objects.',
-    difficulty: 'MEDIUM',
-    theme: 'amber',
-    accentColor: '#f59e0b',
-    bgColor: '#fef3c7'
+    title: 'Multiple Hotspot',
+    icon: '🔎',
+    description: 'Explore the image and find the correct hotspots.',
+    difficulty: 'Medium',
+    color: '#d97706' // Amber accent
   },
   {
     id: 'memory-game',
-    number: '04',
-    title: 'Memory Match',
-    subtitle: 'Find matching pairs and test your recall.',
-    description: 'Find matching pairs and test your recall.',
-    difficulty: 'EASY',
-    theme: 'green',
-    accentColor: '#10b981',
-    bgColor: '#d1fae5'
+    title: 'Memory Game',
+    icon: '🧠',
+    description: 'Flip cards and find matching pairs.',
+    difficulty: 'Easy',
+    color: '#7c3aed' // Purple accent
   },
   {
     id: 'word-scramble',
-    number: '05',
     title: 'Word Scramble',
-    subtitle: 'Rearrange letters to form the correct word.',
-    description: 'Rearrange letters to form the correct word.',
-    difficulty: 'EASY / MEDIUM / HARD',
-    theme: 'coral',
-    accentColor: '#f43f5e',
-    bgColor: '#ffe4e6'
+    icon: '🔤',
+    description: 'Rearrange the letters to make the correct word.',
+    difficulty: 'Easy',
+    color: '#db2777' // Pink accent
   }
 ];

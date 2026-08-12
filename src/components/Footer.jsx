@@ -1,38 +1,17 @@
 import React from 'react';
 
-export default function Footer({ onNavigateHome, onNavigateActivities }) {
-  const handleHome = (e) => {
-    e.preventDefault();
-    if (onNavigateHome) onNavigateHome();
-  };
-
-  const handleActivities = (e) => {
-    e.preventDefault();
-    if (onNavigateActivities) onNavigateActivities();
-  };
-
+export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <div className="footer-left">
-          <div className="footer-logo">
-            <div className="logo-star-badge small">
-              <span className="star-icon">⭐</span>
-            </div>
-            <span className="logo-wordmark white">
-              <span className="logo-learn">Learn</span>
-              <span className="logo-play">Play</span>
-            </span>
-          </div>
-          <p className="footer-tagline">Interactive learning made fun.</p>
+        <div className="footer-brand">
+          <span className="footer-logo-icon">🎮</span>
+          <span className="footer-logo-text">Learn<span className="logo-accent">Play</span></span>
         </div>
-
-        <nav className="footer-center-nav">
-          <a href="#" onClick={handleHome}>Home</a>
-          <a href="#activities" onClick={handleActivities}>Activities</a>
-        </nav>
-
-        <div className="footer-right-copyright">
+        <p className="footer-text">
+          Interactive educational activities designed to make learning fun and engaging for everyone.
+        </p>
+        <div className="footer-bottom">
           <p>&copy; {new Date().getFullYear()} LearnPlay. All rights reserved.</p>
         </div>
       </div>
