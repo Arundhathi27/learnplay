@@ -1,0 +1,68 @@
+<svg viewBox="0 0 160 160" width="160" height="160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Soft Background Glow -->
+  <circle cx="80" cy="85" r="65" fill="#e0e7ff" fillOpacity="0.5" />
+
+  <!-- Headphones Arch -->
+  <path d="M 38 75 C 38 40, 122 40, 122 75" stroke="#7c3aed" stroke-width="10" stroke-linecap="round" />
+  <path d="M 46 72 C 46 45, 114 45, 114 72" stroke="#c084fc" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Main Body (Plump Cute Shape) -->
+  <ellipse cx="80" cy="95" rx="52" ry="48" fill="url(#owlBodyGrad)" />
+
+  <!-- Belly Patch -->
+  <ellipse cx="80" cy="104" rx="34" ry="32" fill="#fff7ed" />
+  <!-- Feather marks on belly -->
+  <path d="M 70 96 C 75 100, 85 100, 90 96" stroke="#fdba74" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M 66 106 C 74 111, 86 111, 94 106" stroke="#fdba74" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M 72 116 C 77 120, 83 120, 88 116" stroke="#fdba74" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Head Horn Tufts -->
+  <path d="M 40 58 Q 50 48, 62 60 Z" fill="#4338ca" />
+  <path d="M 120 58 Q 110 48, 98 60 Z" fill="#4338ca" />
+
+  <!-- Wings -->
+  <path d="M 28 88 C 20 102, 34 122, 46 112 C 40 102, 36 92, 28 88 Z" fill="#3730a3" />
+  <path d="M 132 88 C 140 102, 126 122, 114 112 C 120 102, 124 92, 132 88 Z" fill="#3730a3" />
+
+  <!-- Big Friendly Glasses / Eyes Base -->
+  <circle cx="60" cy="74" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3.5" />
+  <circle cx="100" cy="74" r="22" fill="#ffffff" stroke="#2563eb" stroke-width="3.5" />
+  <!-- Glasses Bridge -->
+  <path d="M 78 74 H 82" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Iris (Large Expressive Pupil) -->
+  <circle cx="63" cy="74" r="13" fill="#1e1b4b" />
+  <circle cx="97" cy="74" r="13" fill="#1e1b4b" />
+
+  <!-- Eye Catchlights -->
+  <circle cx="67" cy="70" r="4.5" fill="#ffffff" />
+  <circle cx="59" cy="77" r="2" fill="#ffffff" />
+  <circle cx="101" cy="70" r="4.5" fill="#ffffff" />
+  <circle cx="93" cy="77" r="2" fill="#ffffff" />
+
+  <!-- Beak -->
+  <path d="M 74 81 L 86 81 L 80 92 Z" fill="#f59e0b" stroke="#d97706" stroke-width="1" />
+
+  <!-- Headphone Cushion Cups -->
+  <rect x="26" y="66" width="16" height="26" rx="8" fill="#7c3aed" />
+  <rect x="30" y="70" width="8" height="18" rx="4" fill="#a855f7" />
+  <rect x="118" y="66" width="16" height="26" rx="8" fill="#7c3aed" />
+  <rect x="122" y="70" width="8" height="18" rx="4" fill="#a855f7" />
+
+  <!-- Graduation Cap -->
+  <path d="M 80 42 L 102 48 L 80 54 L 58 48 Z" fill="#1e1b4b" />
+  <rect x="76" y="52" width="8" height="6" fill="#3730a3" />
+  <path d="M 98 50 V 62" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" />
+  <circle cx="98" cy="63" r="2.5" fill="#fbbf24" />
+
+  <!-- Feet -->
+  <ellipse cx="66" cy="140" rx="8" ry="4" fill="#f59e0b" />
+  <ellipse cx="94" cy="140" rx="8" ry="4" fill="#f59e0b" />
+
+  <defs>
+    <linearGradient id="owlBodyGrad" x1="80" y1="48" x2="80" y2="143" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4f46e5" />
+      <stop offset="1" stop-color="#3730a3" />
+    </linearGradient>
+  </defs>
+</svg>

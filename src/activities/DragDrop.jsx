@@ -40,10 +40,35 @@ const CATEGORIES = [
   { id: 'animals', title: 'Animals', icon: '🐾' }
 ];
 
-export default function DragDrop({ onBack }) {
+export default function DragDrop({ onBack, data }) {
+  const activeCategories = (data?.content?.dropZones && data.content.dropZones.length > 0)
+    ? data.content.dropZones.map((z) => typeof z === 'string'
+        ? { id: z.toLowerCase().trim(), title: z.trim(), icon: '📦' }
+        : { id: (z.id || z.name).toLowerCase().trim(), title: z.name || z.title, icon: '📦' })
+    : CATEGORIES;
+
+  const activeItems = (data?.content?.items && data.content.items.length > 0)
+    ? data.content.items.map((item, idx) => ({
+        id: item.id || `item_${idx}`,
+        name: item.name || item.text || item.title || 'Item',
+        emoji: item.emoji || '📦',
+        category: (item.correctZoneId || item.targetZone || item.category || '').toLowerCase().trim()
+      }))
+    : null;
+
+  const activeRounds = activeItems
+    ? [{ roundNumber: 1, items: activeItems }]
+    : ROUNDS_DATA;
+
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
-  const [roundAvailableItems, setRoundAvailableItems] = useState(ROUNDS_DATA[0].items);
-  const [roundSortedItems, setRoundSortedItems] = useState({ fruits: [], animals: [] });
+  const [roundAvailableItems, setRoundAvailableItems] = useState(activeRounds[0].items);
+  const [roundSortedItems, setRoundSortedItems] = useState(() => {
+    const initial = {};
+    activeCategories.forEach((cat) => {
+      initial[cat.id] = [];
+    });
+    return initial;
+  });
   const [score, setScore] = useState(0);
   const [draggedItem, setDraggedItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -51,11 +76,8 @@ export default function DragDrop({ onBack }) {
   const [feedback, setFeedback] = useState(null);
   const [isGameCompleted, setIsGameCompleted] = useState(false);
 
-  const totalRounds = ROUNDS_DATA.length;
-  const totalGameItems = 12; // 4 rounds * 3 items
-  const maxScore = totalGameItems * 10;
-
-  const currentRound = ROUNDS_DATA[currentRoundIndex];
+  const totalRounds = activeRounds.length;
+  const currentRound = activeRounds[currentRoundIndex] || activeRounds[0];
   const roundTotalItems = currentRound.items.length;
   const roundSortedCount = roundTotalItems - roundAvailableItems.length;
   const isRoundComplete = roundAvailableItems.length === 0;
@@ -312,7 +334,7 @@ export default function DragDrop({ onBack }) {
 
         {/* Drop Zones Section */}
         <section className="drop-zones-section">
-          {CATEGORIES.map((category) => {
+          {activeCategories.map((category) => {
             const isHovered = activeDropZone === category.id;
             const itemsInCategory = roundSortedItems[category.id] || [];
 

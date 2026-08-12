@@ -62,32 +62,83 @@ const createShuffledCards = (roundIndex) => {
   return cardDeck;
 };
 
-export default function MemoryGame({ onBack }) {
+export default function MemoryGame({ onBack, data }) {
+  const activeDeck = React.useMemo(() => {
+    if (data?.content?.pairs && data.content.pairs.length > 0) {
+      const cardDeck = [];
+      data.content.pairs.forEach((p, idx) => {
+        const pairId = p.id || `pair_${idx}`;
+        const cardA = p.cards ? p.cards[0] : { text: p.cardA || 'Card A', emoji: p.cardA || '🎴' };
+        const cardB = p.cards ? p.cards[1] : { text: p.cardB || 'Card B', emoji: p.cardB || '🎴' };
+
+        cardDeck.push({
+          id: `card_${pairId}_a`,
+          pairId: pairId,
+          name: cardA.text || cardA.name || 'Card',
+          emoji: cardA.emoji || (cardA.image ? '' : '🎴'),
+          image: cardA.image || null,
+          isFlipped: false,
+          isMatched: false
+        });
+
+        cardDeck.push({
+          id: `card_${pairId}_b`,
+          pairId: pairId,
+          name: cardB.text || cardB.name || 'Card',
+          emoji: cardB.emoji || (cardB.image ? '' : '🎴'),
+          image: cardB.image || null,
+          isFlipped: false,
+          isMatched: false
+        });
+      });
+
+      // Fisher-Yates shuffle
+      if (data.settings?.randomize !== false) {
+        for (let i = cardDeck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
+        }
+      }
+      return cardDeck;
+    }
+
+    return createShuffledCards(0);
+  }, [data]);
+
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
-  const [cards, setCards] = useState(() => createShuffledCards(0));
+  const [cards, setCards] = useState(activeDeck);
   const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const totalRounds = ROUNDS_DATA.length;
-  const totalPairsGame = 12; // 3 rounds * 4 pairs
+  useEffect(() => {
+    setCards(activeDeck);
+  }, [activeDeck]);
+
+  const isCustomMode = Boolean(data?.content?.pairs);
+  const totalRounds = isCustomMode ? 1 : ROUNDS_DATA.length;
+  const totalPairsGame = cards.length / 2;
   const maxScore = totalPairsGame * 10;
 
   const matchedInRound = cards.filter((c) => c.isMatched).length / 2;
-  const isRoundComplete = matchedInRound === 4;
+  const isRoundComplete = isCustomMode
+    ? (cards.length > 0 && cards.every((c) => c.isMatched))
+    : matchedInRound === 4;
 
   const completedPreviousPairs = currentRoundIndex * 4;
-  const totalMatchedPairs = completedPreviousPairs + matchedInRound;
+  const totalMatchedPairs = isCustomMode ? matchedInRound : completedPreviousPairs + matchedInRound;
 
-  // Initialize cards on round change
+  // Initialize cards on round change for default mode
   useEffect(() => {
-    setCards(createShuffledCards(currentRoundIndex));
-    setFlippedCards([]);
-    setIsChecking(false);
-    setFeedback(null);
-  }, [currentRoundIndex]);
+    if (!isCustomMode) {
+      setCards(createShuffledCards(currentRoundIndex));
+      setFlippedCards([]);
+      setIsChecking(false);
+      setFeedback(null);
+    }
+  }, [currentRoundIndex, isCustomMode]);
 
   const handleCardClick = (clickedCard) => {
     if (
@@ -295,7 +346,11 @@ export default function MemoryGame({ onBack }) {
 
                   {/* Card Back (Face Up) */}
                   <div className="card-face card-back">
-                    <span className="card-emoji">{card.emoji}</span>
+                    {card.image ? (
+                      <img src={card.image} alt={card.name} style={{ maxWidth: '80%', maxHeight: '60%', borderRadius: '6px', objectFit: 'contain' }} />
+                    ) : (
+                      <span className="card-emoji">{card.emoji}</span>
+                    )}
                     <span className="card-name">{card.name}</span>
                     {card.isMatched && <span className="matched-badge">✅</span>}
                   </div>

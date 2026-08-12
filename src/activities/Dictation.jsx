@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import owlImage from '../assets/owl.png';
 
 const WORDS = [
   { id: 1, word: 'Apple' },
@@ -11,7 +12,7 @@ const WORDS = [
   { id: 8, word: 'Beautiful' }
 ];
 
-export default function Dictation({ onBack }) {
+export default function Dictation({ onBack, data }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
@@ -24,8 +25,12 @@ export default function Dictation({ onBack }) {
 
   const inputRef = useRef(null);
 
-  const currentItem = WORDS[currentIndex];
-  const totalQuestions = WORDS.length;
+  const activeWords = (data?.content?.words && data.content.words.length > 0)
+    ? data.content.words.map((w, i) => ({ id: i + 1, word: w }))
+    : WORDS;
+
+  const currentItem = activeWords[currentIndex] || activeWords[0];
+  const totalQuestions = activeWords.length;
   const maxScore = totalQuestions * 10;
 
   // Asynchronously load and cache speech synthesis voices
@@ -51,14 +56,12 @@ export default function Dictation({ onBack }) {
     const availableVoices = voices.length > 0 ? voices : window.speechSynthesis.getVoices();
     if (!availableVoices || availableVoices.length === 0) return null;
 
-    // Filter all English voices
     const englishVoices = availableVoices.filter(
       (v) => v.lang && (v.lang.toLowerCase().startsWith('en') || v.lang.toLowerCase().includes('en'))
     );
 
     const voiceList = englishVoices.length > 0 ? englishVoices : availableVoices;
 
-    // Preferred keywords in order of priority for high-clarity natural synthesis
     const preferredKeywords = [
       'google us english',
       'google uk english',
@@ -77,7 +80,6 @@ export default function Dictation({ onBack }) {
       if (match) return match;
     }
 
-    // Fall back to default English voice or first available English voice
     const defaultVoice = voiceList.find((v) => v.default);
     return defaultVoice || voiceList[0] || null;
   };
@@ -85,19 +87,14 @@ export default function Dictation({ onBack }) {
   const speakWord = (text) => {
     if (!('speechSynthesis' in window)) return;
 
-    // Cancel any active speech synthesis
     window.speechSynthesis.cancel();
 
-    // Create new utterance
     const utterance = new SpeechSynthesisUtterance(text);
-
-    // Configure playback properties for dictation clarity
     utterance.lang = 'en-US';
-    utterance.rate = 0.75; // Slower rate for clear dictation
+    utterance.rate = 0.75;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
-    // Select clearest available voice
     const selectedVoice = getBestEnglishVoice();
     if (selectedVoice) {
       utterance.voice = selectedVoice;
@@ -120,10 +117,13 @@ export default function Dictation({ onBack }) {
     window.speechSynthesis.speak(utterance);
   };
 
-  // Focus input when question changes (without auto-speaking)
+  // Speak word automatically when current question loads & focus input
   useEffect(() => {
-    if (!isCompleted && inputRef.current) {
-      inputRef.current.focus();
+    if (!isCompleted) {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      speakWord(currentItem.word);
     }
   }, [currentIndex, isCompleted]);
 
@@ -228,8 +228,8 @@ export default function Dictation({ onBack }) {
         {/* Game Header Bar */}
         <div className="dictation-game-header">
           <div className="activity-title-group">
-            <h1 className="dictation-title">🎧 Dictation</h1>
-            <p className="dictation-instruction">Listen carefully and type what you hear.</p>
+            <h1 className="dictation-title">🎧 {data?.title || 'Dictation'}</h1>
+            <p className="dictation-instruction">{data?.description || 'Listen carefully and type what you hear.'}</p>
           </div>
 
           <div className="dictation-stats">
@@ -250,6 +250,39 @@ export default function Dictation({ onBack }) {
             className="progress-bar-fill"
             style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
           ></div>
+        </div>
+
+        {/* Owl Dictator Mascot Presentation */}
+        <div className="dictation-mascot-section">
+          {/* Educational Speech Bubble */}
+          <div className="owl-speech-bubble">
+            <span className="bubble-text">{isSpeaking ? "I'm speaking..." : "Listen carefully!"}</span>
+            <div className="bubble-tail"></div>
+          </div>
+
+          {/* Stage with Sound Waves & Owl Image */}
+          <div className="dictation-mascot-stage">
+            <div className={`sound-waves wave-left ${isSpeaking ? 'active' : ''}`} aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div className={`owl-mascot-wrapper ${isSpeaking ? 'owl-speaking' : ''}`}>
+              <img
+                src={owlImage}
+                alt="Vblivestream owl narrator"
+                className="dictation-owl-img"
+              />
+              <div className="dictation-owl-shadow"></div>
+            </div>
+
+            <div className={`sound-waves wave-right ${isSpeaking ? 'active' : ''}`} aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
         </div>
 
         {/* Listen Button */}

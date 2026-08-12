@@ -94,6 +94,79 @@ const HOMEPAGE_ACTIVITIES = [
         <path d="M22 42L32 20L42 42M25 35H39" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     )
+  },
+  {
+    id: 'find-hotspot',
+    number: '06',
+    title: 'Find Hotspot',
+    description: 'Spot and click the single target location in the image scene.',
+    difficulty: 'Easy',
+    accentColor: '#2563eb', // Blue
+    bgGradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    badgeBg: '#dbeafe',
+    badgeText: '#1e40af',
+    iconGraphic: (
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
+        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
+        <circle cx="32" cy="32" r="16" stroke="white" strokeWidth="4" />
+        <circle cx="32" cy="32" r="8" fill="white" />
+        <path d="M32 10V18M32 46V54M10 32H18M46 32H54" stroke="white" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'flashcards',
+    number: '07',
+    title: 'Flashcards',
+    description: 'Test your memory and study knowledge with interactive cards.',
+    difficulty: 'Easy',
+    accentColor: '#8b5cf6', // Purple
+    bgGradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    badgeBg: '#f3e8ff',
+    badgeText: '#7e22ce',
+    iconGraphic: (
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
+        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
+        <rect x="18" y="16" width="28" height="36" rx="4" fill="white" fillOpacity="0.9" />
+        <rect x="22" y="12" width="28" height="36" rx="4" stroke="white" strokeWidth="3" fill="none" />
+      </svg>
+    )
+  },
+  {
+    id: 'crossword',
+    number: '08',
+    title: 'Crossword',
+    description: 'Solve the crossword puzzle by solving clue hints.',
+    difficulty: 'Medium',
+    accentColor: '#0284c7', // Sky Blue
+    bgGradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+    badgeBg: '#e0f2fe',
+    badgeText: '#0369a1',
+    iconGraphic: (
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
+        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
+        <path d="M16 16H48V48H16V16Z" stroke="white" strokeWidth="3" />
+        <path d="M26.66 16V48M37.33 16V48M16 26.66H48M16 37.33H48" stroke="white" strokeWidth="2" strokeOpacity="0.6" />
+      </svg>
+    )
+  },
+  {
+    id: 'drag-the-words',
+    number: '09',
+    title: 'Drag the Words',
+    description: 'Drag the correct words into the blanks in the sentence.',
+    difficulty: 'Easy',
+    accentColor: '#0d9488', // Teal
+    bgGradient: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+    badgeBg: '#ccfbf1',
+    badgeText: '#115e59',
+    iconGraphic: (
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
+        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
+        <path d="M16 22H48M16 32H32M16 42H40" stroke="white" strokeWidth="4" strokeLinecap="round" />
+        <rect x="36" y="28" width="16" height="8" rx="2" fill="white" fillOpacity="0.8" />
+      </svg>
+    )
   }
 ];
 
@@ -141,7 +214,7 @@ export default function Home({ onSelectActivity }) {
             <div className="hero-illustration-wrapper">
               <img
                 src={heroIllustration}
-                alt="LearnPlay Interactive Learning Illustration"
+                alt="VBlivestream Interactive Learning Illustration"
                 className="home-hero-img"
               />
             </div>

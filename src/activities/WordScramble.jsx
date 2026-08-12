@@ -33,18 +33,49 @@ const shuffleWordLetters = (word) => {
   }));
 };
 
-export default function WordScramble({ onBack }) {
+export default function WordScramble({ onBack, data }) {
+  const activeWordsList = React.useMemo(() => {
+    if (data?.content?.words && data.content.words.length > 0) {
+      let list = data.content.words.map((w, idx) => ({
+        id: idx + 1,
+        word: w.toUpperCase().trim(),
+        difficulty: data.settings?.difficulty || data.content?.difficulty || 'Medium'
+      }));
+
+      if (data.settings?.randomize !== false) {
+        list = [...list];
+        for (let i = list.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [list[i], list[j]] = [list[j], list[i]];
+        }
+      }
+      return list;
+    }
+    return WORDS_DATA;
+  }, [data]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [tiles, setTiles] = useState(() => shuffleWordLetters(WORDS_DATA[0].word));
+  const [tiles, setTiles] = useState(() => shuffleWordLetters(activeWordsList[0].word));
   const [selectedTiles, setSelectedTiles] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const totalQuestions = WORDS_DATA.length;
+  useEffect(() => {
+    if (activeWordsList[0]) {
+      setCurrentIndex(0);
+      setTiles(shuffleWordLetters(activeWordsList[0].word));
+      setSelectedTiles([]);
+      setFeedback(null);
+      setIsCorrect(false);
+    }
+  }, [activeWordsList]);
+
+  const currentItem = activeWordsList[currentIndex] || activeWordsList[0];
+  const totalQuestions = activeWordsList.length;
   const maxScore = totalQuestions * 10;
-  const currentWordObj = WORDS_DATA[currentIndex];
+  const currentWordObj = activeWordsList[currentIndex];
 
   // Reset & shuffle tiles when moving to a new word
   useEffect(() => {

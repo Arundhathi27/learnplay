@@ -48,7 +48,29 @@ const SCENES = [
   }
 ];
 
-export default function Hotspot({ onBack }) {
+export default function Hotspot({ onBack, data }) {
+  const activeScenes = (data?.content?.hotspots && data.content.hotspots.length > 0)
+    ? [
+        {
+          id: 1,
+          title: data.title || 'Find Multiple Hotspots',
+          instruction: data.description || 'Explore the image and click all correct hotspots.',
+          bgClass: data.content.image ? '' : 'scene-classroom',
+          image: data.content.image || null,
+          requiredCorrect: data.content.requiredCorrect,
+          objects: data.content.hotspots.map((h) => ({
+            id: `h_${h.id}`,
+            name: h.label || (h.isCorrect ? 'Target' : 'Item'),
+            emoji: h.isCorrect ? '🎯' : '📍',
+            isCorrect: Boolean(h.isCorrect),
+            top: `${h.y}%`,
+            left: `${h.x}%`,
+            feedback: h.feedback
+          }))
+        }
+      ]
+    : SCENES;
+
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [foundIds, setFoundIds] = useState([]);
@@ -56,8 +78,8 @@ export default function Hotspot({ onBack }) {
   const [feedback, setFeedback] = useState(null);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const currentScene = SCENES[currentRoundIndex];
-  const totalRounds = SCENES.length;
+  const currentScene = activeScenes[currentRoundIndex] || activeScenes[0];
+  const totalRounds = activeScenes.length;
   const maxScore = 90; // 9 targets total * 10 pts
 
   const targetCountInRound = currentScene.objects.filter((o) => o.isCorrect).length;
@@ -220,7 +242,10 @@ export default function Hotspot({ onBack }) {
         )}
 
         {/* Interactive Visual Scene Container */}
-        <div className={`hotspot-scene-container ${currentScene.bgClass}`}>
+        <div
+          className={`hotspot-scene-container ${currentScene.bgClass}`}
+          style={currentScene.image ? { backgroundImage: `url(${currentScene.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+        >
           <div className="scene-watermark-title">{currentScene.title}</div>
 
           {currentScene.objects.map((obj) => {
