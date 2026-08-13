@@ -1,6 +1,17 @@
 import React from 'react';
 import heroIllustration from '../assets/learnplay_hero_illustration.jpg';
 
+// Illustrated Card Background Images
+import dictationBg from '../assets/activities/dictation-bg.jpg';
+import dragDropBg from '../assets/activities/drag-drop-bg.jpg';
+import findMultipleHotspotsBg from '../assets/activities/find-multiple-hotspots-bg.jpg';
+import findHotspotBg from '../assets/activities/find-hotspot-bg.jpg';
+import memoryGameBg from '../assets/activities/memory-game-bg.jpg';
+import wordScrambleBg from '../assets/activities/word-scramble-bg.jpg';
+import flashcardsBg from '../assets/activities/flashcards-bg.jpg';
+import crosswordBg from '../assets/activities/crossword-bg.jpg';
+import dragTheWordsBg from '../assets/activities/drag-the-words-bg.jpg';
+
 const HOMEPAGE_ACTIVITIES = [
   {
     id: 'dictation',
@@ -8,18 +19,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Dictation',
     description: 'Listen carefully to spoken words and type what you hear.',
     difficulty: 'Easy',
-    accentColor: '#8b5cf6', // Purple
-    bgGradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    accentColor: '#8b5cf6',
     badgeBg: '#f3e8ff',
     badgeText: '#7e22ce',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <path d="M22 28V36M28 22V42M34 26V38M40 30V34" stroke="white" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="20" cy="32" r="6" stroke="white" strokeWidth="3" />
-        <circle cx="44" cy="32" r="6" stroke="white" strokeWidth="3" />
-      </svg>
-    )
+    bgImage: dictationBg
   },
   {
     id: 'drag-drop',
@@ -27,19 +30,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Sort & Match',
     description: 'Drag and sort items into the correct categories across 4 rounds.',
     difficulty: 'Easy',
-    accentColor: '#3b82f6', // Blue
-    bgGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+    accentColor: '#3b82f6',
     badgeBg: '#dbeafe',
     badgeText: '#1e40af',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <rect x="18" y="18" width="12" height="12" rx="3" fill="white" fillOpacity="0.9" />
-        <rect x="34" y="18" width="12" height="12" rx="3" fill="white" fillOpacity="0.5" />
-        <rect x="18" y="34" width="12" height="12" rx="3" fill="white" fillOpacity="0.5" />
-        <rect x="34" y="34" width="12" height="12" rx="3" fill="white" fillOpacity="0.9" />
-      </svg>
-    )
+    bgImage: dragDropBg
   },
   {
     id: 'multiple-hotspot',
@@ -47,18 +41,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Find Objects',
     description: 'Explore visual scenes to spot and select all hidden target objects.',
     difficulty: 'Medium',
-    accentColor: '#f59e0b', // Yellow / Amber
-    bgGradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
+    accentColor: '#f59e0b',
     badgeBg: '#fef3c7',
     badgeText: '#92400e',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <circle cx="30" cy="30" r="12" stroke="white" strokeWidth="4" />
-        <path d="M39 39L48 48" stroke="white" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="30" cy="30" r="4" fill="white" />
-      </svg>
-    )
+    bgImage: findMultipleHotspotsBg
   },
   {
     id: 'memory-game',
@@ -66,17 +52,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Memory Game',
     description: 'Flip cards and test your visual memory to match hidden pairs.',
     difficulty: 'Easy',
-    accentColor: '#14b8a6', // Teal
-    bgGradient: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
+    accentColor: '#14b8a6',
     badgeBg: '#ccfbf1',
     badgeText: '#115e59',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <rect x="16" y="20" width="14" height="24" rx="3" fill="white" fillOpacity="0.9" />
-        <rect x="34" y="20" width="14" height="24" rx="3" stroke="white" strokeWidth="3" fill="none" />
-      </svg>
-    )
+    bgImage: memoryGameBg
   },
   {
     id: 'word-scramble',
@@ -84,16 +63,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Word Scramble',
     description: 'Click letter tiles in order to unscramble target vocabulary words.',
     difficulty: 'Easy',
-    accentColor: '#f97316', // Coral
-    bgGradient: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
+    accentColor: '#f97316',
     badgeBg: '#ffedd5',
     badgeText: '#9a3412',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <path d="M22 42L32 20L42 42M25 35H39" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
+    bgImage: wordScrambleBg
   },
   {
     id: 'find-hotspot',
@@ -101,18 +74,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Find Hotspot',
     description: 'Spot and click the single target location in the image scene.',
     difficulty: 'Easy',
-    accentColor: '#2563eb', // Blue
-    bgGradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+    accentColor: '#2563eb',
     badgeBg: '#dbeafe',
     badgeText: '#1e40af',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <circle cx="32" cy="32" r="16" stroke="white" strokeWidth="4" />
-        <circle cx="32" cy="32" r="8" fill="white" />
-        <path d="M32 10V18M32 46V54M10 32H18M46 32H54" stroke="white" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-    )
+    bgImage: findHotspotBg
   },
   {
     id: 'flashcards',
@@ -120,17 +85,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Flashcards',
     description: 'Test your memory and study knowledge with interactive cards.',
     difficulty: 'Easy',
-    accentColor: '#8b5cf6', // Purple
-    bgGradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    accentColor: '#8b5cf6',
     badgeBg: '#f3e8ff',
     badgeText: '#7e22ce',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <rect x="18" y="16" width="28" height="36" rx="4" fill="white" fillOpacity="0.9" />
-        <rect x="22" y="12" width="28" height="36" rx="4" stroke="white" strokeWidth="3" fill="none" />
-      </svg>
-    )
+    bgImage: flashcardsBg
   },
   {
     id: 'crossword',
@@ -138,17 +96,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Crossword',
     description: 'Solve the crossword puzzle by solving clue hints.',
     difficulty: 'Medium',
-    accentColor: '#0284c7', // Sky Blue
-    bgGradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+    accentColor: '#0284c7',
     badgeBg: '#e0f2fe',
     badgeText: '#0369a1',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <path d="M16 16H48V48H16V16Z" stroke="white" strokeWidth="3" />
-        <path d="M26.66 16V48M37.33 16V48M16 26.66H48M16 37.33H48" stroke="white" strokeWidth="2" strokeOpacity="0.6" />
-      </svg>
-    )
+    bgImage: crosswordBg
   },
   {
     id: 'drag-the-words',
@@ -156,17 +107,10 @@ const HOMEPAGE_ACTIVITIES = [
     title: 'Drag the Words',
     description: 'Drag the correct words into the blanks in the sentence.',
     difficulty: 'Easy',
-    accentColor: '#0d9488', // Teal
-    bgGradient: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+    accentColor: '#0d9488',
     badgeBg: '#ccfbf1',
     badgeText: '#115e59',
-    iconGraphic: (
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="card-custom-svg">
-        <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.15)" />
-        <path d="M16 22H48M16 32H32M16 42H40" stroke="white" strokeWidth="4" strokeLinecap="round" />
-        <rect x="36" y="28" width="16" height="8" rx="2" fill="white" fillOpacity="0.8" />
-      </svg>
-    )
+    bgImage: dragTheWordsBg
   }
 ];
 
@@ -183,7 +127,6 @@ export default function Home({ onSelectActivity }) {
     <div className="home-wrapper" id="top">
       {/* HERO SECTION */}
       <section className="home-hero">
-        {/* Subtle Decorative Elements */}
         <div className="hero-deco star-1" aria-hidden="true">✦</div>
         <div className="hero-deco star-2" aria-hidden="true">✦</div>
         <div className="hero-deco circle-1" aria-hidden="true"></div>
@@ -205,7 +148,7 @@ export default function Home({ onSelectActivity }) {
               >
                 Start Learning →
               </button>
-              <span className="home-hero-subtext">5 interactive activities</span>
+              <span className="home-hero-subtext">9 interactive activities</span>
             </div>
           </div>
 
@@ -233,13 +176,14 @@ export default function Home({ onSelectActivity }) {
           <div className="home-activity-grid">
             {HOMEPAGE_ACTIVITIES.map((activity) => (
               <article key={activity.id} className="home-activity-card">
-                {/* Banner Area */}
-                <div
-                  className="home-card-banner"
-                  style={{ background: activity.bgGradient }}
-                >
+                {/* Illustrated Image Banner */}
+                <div className="home-card-banner">
+                  <img
+                    src={activity.bgImage}
+                    alt={activity.title}
+                    className="home-card-illustration-img"
+                  />
                   <span className="home-card-number">{activity.number}</span>
-                  <div className="home-card-icon-box">{activity.iconGraphic}</div>
                 </div>
 
                 {/* Body Area */}
