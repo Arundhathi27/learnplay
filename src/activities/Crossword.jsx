@@ -66,21 +66,28 @@ function placeWord(grid, word, r, c, dir, wordId) {
   }
 }
 
-export function buildCrosswordLayout(wordsList) {
-  const GRID_SIZE = 12;
+export function buildCrosswordLayout(wordsListInput) {
+  const wordsList = (wordsListInput && Array.isArray(wordsListInput) && wordsListInput.length > 0)
+    ? wordsListInput
+    : DEFAULT_CROSSWORD_DATA.words;
+
+  const GRID_SIZE = 14;
   let grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(null));
   const placedWords = [];
 
   wordsList.forEach((wordObj, index) => {
-    const word = wordObj.answer.toUpperCase();
+    if (!wordObj || !wordObj.answer) return;
+    const word = wordObj.answer.toUpperCase().trim();
+    if (!word) return;
     let placed = false;
 
-    if (index === 0) {
+    if (placedWords.length === 0) {
       const r = Math.floor(GRID_SIZE / 2);
       const c = Math.max(0, Math.floor((GRID_SIZE - word.length) / 2));
-      placeWord(grid, word, r, c, 'across', wordObj.id);
+      placeWord(grid, word, r, c, 'across', wordObj.id || `w_${index}`);
       placedWords.push({
         ...wordObj,
+        id: wordObj.id || `w_${index}`,
         answer: word,
         row: r,
         col: c,
@@ -88,6 +95,7 @@ export function buildCrosswordLayout(wordsList) {
       });
       placed = true;
     } else {
+      // 1. Try to intersect with already placed words
       for (let pWord of placedWords) {
         if (placed) break;
         const pStr = pWord.answer;
@@ -106,9 +114,10 @@ export function buildCrosswordLayout(wordsList) {
               const newC = newDir === 'across' ? intersectC - i : intersectC;
 
               if (canPlaceWord(grid, word, newR, newC, newDir, GRID_SIZE)) {
-                placeWord(grid, word, newR, newC, newDir, wordObj.id);
+                placeWord(grid, word, newR, newC, newDir, wordObj.id || `w_${index}`);
                 placedWords.push({
                   ...wordObj,
+                  id: wordObj.id || `w_${index}`,
                   answer: word,
                   row: newR,
                   col: newC,
@@ -122,14 +131,16 @@ export function buildCrosswordLayout(wordsList) {
         }
       }
 
+      // 2. Fallback: place in an open position if no intersection possible
       if (!placed) {
         for (let r = 0; r < GRID_SIZE; r++) {
           if (placed) break;
-          for (let c = 0; c < GRID_SIZE - word.length; c++) {
+          for (let c = 0; c <= GRID_SIZE - word.length; c++) {
             if (canPlaceWord(grid, word, r, c, 'across', GRID_SIZE)) {
-              placeWord(grid, word, r, c, 'across', wordObj.id);
+              placeWord(grid, word, r, c, 'across', wordObj.id || `w_${index}`);
               placedWords.push({
                 ...wordObj,
+                id: wordObj.id || `w_${index}`,
                 answer: word,
                 row: r,
                 col: c,
@@ -144,7 +155,11 @@ export function buildCrosswordLayout(wordsList) {
     }
   });
 
-  // Minimum bounding box
+  if (placedWords.length === 0) {
+    return buildCrosswordLayout(DEFAULT_CROSSWORD_DATA.words);
+  }
+
+  // Minimum bounding box calculation
   let minR = GRID_SIZE, maxR = 0, minC = GRID_SIZE, maxC = 0;
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
@@ -157,12 +172,12 @@ export function buildCrosswordLayout(wordsList) {
     }
   }
 
-  const rows = maxR - minR + 1;
-  const cols = maxC - minC + 1;
+  const rows = Math.max(1, maxR - minR + 1);
+  const cols = Math.max(1, maxC - minC + 1);
 
   placedWords.forEach((pw) => {
-    pw.row = pw.row - minR;
-    pw.col = pw.col - minC;
+    pw.row = Math.max(0, pw.row - minR);
+    pw.col = Math.max(0, pw.col - minC);
   });
 
   // Assign starting cell clue numbers
@@ -199,16 +214,18 @@ export function buildCrosswordLayout(wordsList) {
       const r = pw.direction === 'down' ? pw.row + i : pw.row;
       const c = pw.direction === 'across' ? pw.col + i : pw.col;
 
-      if (!finalGrid[r][c]) {
-        finalGrid[r][c] = {
-          char: pw.answer[i],
-          number: i === 0 ? pw.number : null,
-          wordIds: [pw.id]
-        };
-      } else {
-        if (i === 0) finalGrid[r][c].number = pw.number;
-        if (!finalGrid[r][c].wordIds.includes(pw.id)) {
-          finalGrid[r][c].wordIds.push(pw.id);
+      if (r >= 0 && r < rows && c >= 0 && c < cols) {
+        if (!finalGrid[r][c]) {
+          finalGrid[r][c] = {
+            char: pw.answer[i],
+            number: i === 0 ? pw.number : null,
+            wordIds: [pw.id]
+          };
+        } else {
+          if (i === 0) finalGrid[r][c].number = pw.number;
+          if (!finalGrid[r][c].wordIds.includes(pw.id)) {
+            finalGrid[r][c].wordIds.push(pw.id);
+          }
         }
       }
     }
@@ -217,8 +234,11 @@ export function buildCrosswordLayout(wordsList) {
   return { grid: finalGrid, placedWords, rows, cols };
 }
 
-export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
-  const [layout, setLayout] = useState(null);
+export default function Crossword({ onBack, data: propsData }) {
+  const data = propsData || DEFAULT_CROSSWORD_DATA;
+  const rawWords = data?.content?.words || data?.words || DEFAULT_CROSSWORD_DATA.words;
+
+  const [layout, setLayout] = useState(() => buildCrosswordLayout(rawWords));
   const [userInputs, setUserInputs] = useState({});
   const [cellStates, setCellStates] = useState({});
   const [feedback, setFeedback] = useState(null);
@@ -229,8 +249,8 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
   const inputRefs = useRef({});
 
   useEffect(() => {
-    const rawWords = data?.content?.words || data?.words || DEFAULT_CROSSWORD_DATA.words;
-    const generated = buildCrosswordLayout(rawWords);
+    const wordsToBuild = data?.content?.words || data?.words || DEFAULT_CROSSWORD_DATA.words;
+    const generated = buildCrosswordLayout(wordsToBuild);
     setLayout(generated);
     setUserInputs({});
     setCellStates({});
@@ -240,11 +260,10 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
     setShowSolution(false);
   }, [data]);
 
-  if (!layout) return null;
-
-  const { grid, placedWords, rows, cols } = layout;
+  const activeLayout = layout || buildCrosswordLayout(DEFAULT_CROSSWORD_DATA.words);
+  const { grid, placedWords, rows, cols } = activeLayout;
   const totalWords = placedWords.length;
-  const maxScore = totalWords * 10;
+  const maxScore = Math.max(totalWords * 10, 10);
 
   const acrossClues = placedWords.filter((w) => w.direction === 'across');
   const downClues = placedWords.filter((w) => w.direction === 'down');
@@ -333,7 +352,8 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
   };
 
   const handlePlayAgain = () => {
-    const generated = buildCrosswordLayout(data.words);
+    const wordsToBuild = data?.content?.words || data?.words || DEFAULT_CROSSWORD_DATA.words;
+    const generated = buildCrosswordLayout(wordsToBuild);
     setLayout(generated);
     setUserInputs({});
     setCellStates({});
@@ -359,7 +379,7 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
           <h1 className="result-title">Great Job!</h1>
           <p className="result-subtitle">You completed the Crossword puzzle.</p>
 
-          {data.solutionWord && (
+          {data?.solutionWord && (
             <div className="solution-word-banner">
               <span className="solution-label">Solution Word:</span>
               <span className="solution-value">{data.solutionWord}</span>
@@ -398,54 +418,67 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
       </div>
 
       <div className="crossword-card">
-        {/* Header Bar */}
+        {/* Header Section */}
         <div className="game-header">
           <div className="activity-title-group">
-            <h1 className="activity-main-title">✏️ Crossword</h1>
-            <p className="activity-instruction">{data.description}</p>
+            <h1 className="activity-main-title">{data?.title || '✏️ Crossword Puzzle'}</h1>
+            <p className="activity-instruction">{data?.description || 'Read each clue and fill in the puzzle.'}</p>
           </div>
 
           <div className="game-stats">
             <div className="stat-pill stat-score">
               <span className="stat-label">Score</span>
-              <span className="stat-value">{score}</span>
+              <span className="stat-value">{score} / {maxScore}</span>
             </div>
           </div>
         </div>
 
-        {/* Main Content Layout: Grid + Clues */}
+        {/* Feedback Message */}
+        {feedback && (
+          <div className={`dictation-feedback feedback-${feedback.type}`} role="alert">
+            {feedback.message}
+          </div>
+        )}
+
+        {/* Crossword Stage Layout: Grid + Clues */}
         <div className="crossword-main-layout">
-          {/* Crossword Grid Stage */}
+          {/* Left / Center Grid Box */}
           <div className="crossword-grid-container">
             <div
               className="crossword-grid"
               style={{
-                gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
                 gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
               }}
             >
-              {grid.map((row, r) =>
-                row.map((cell, c) => {
+              {grid.map((rowArr, r) =>
+                rowArr.map((cell, c) => {
                   const key = `${r}-${c}`;
-                  const stateClass = cellStates[key] || '';
-
                   if (!cell) {
                     return <div key={key} className="crossword-cell cell-empty" />;
                   }
 
+                  const cellState = cellStates[key];
+                  const userChar = userInputs[key] || '';
+                  const displayChar = showSolution ? cell.char : userChar;
+
                   return (
-                    <div key={key} className={`crossword-cell cell-active ${stateClass}`}>
+                    <div
+                      key={key}
+                      className={`crossword-cell cell-active ${cellState ? cellState : ''}`}
+                    >
                       {cell.number && <span className="cell-number">{cell.number}</span>}
                       <input
-                        ref={(el) => (inputRefs.current[key] = el)}
                         type="text"
                         maxLength={1}
-                        className="cell-input"
-                        value={userInputs[key] || ''}
+                        value={displayChar}
                         onChange={(e) => handleInputChange(r, c, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(r, c, e)}
-                        aria-label={`Letter cell for Row ${r + 1} Column ${c + 1}${cell.number ? `, Clue ${cell.number}` : ''}`}
+                        ref={(el) => (inputRefs.current[key] = el)}
+                        className="cell-input"
+                        disabled={showSolution}
                         autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
                       />
                     </div>
                   );
@@ -454,30 +487,32 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
             </div>
           </div>
 
-          {/* Clues Panel */}
+          {/* Right Clues Panel */}
           <div className="crossword-clues-panel">
+            {/* Across Clues */}
             {acrossClues.length > 0 && (
               <div className="clues-section">
-                <h3 className="clues-title">Across</h3>
+                <h2 className="clues-title">Across</h2>
                 <ul className="clues-list">
-                  {acrossClues.map((w) => (
-                    <li key={w.id} className="clue-item">
-                      <span className="clue-number">{w.number}.</span>
-                      <span className="clue-text">{w.clue}</span>
+                  {acrossClues.map((item) => (
+                    <li key={item.id} className="clue-item">
+                      <span className="clue-number">{item.number}.</span>
+                      <span className="clue-text">{item.clue}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
+            {/* Down Clues */}
             {downClues.length > 0 && (
               <div className="clues-section">
-                <h3 className="clues-title">Down</h3>
+                <h2 className="clues-title">Down</h2>
                 <ul className="clues-list">
-                  {downClues.map((w) => (
-                    <li key={w.id} className="clue-item">
-                      <span className="clue-number">{w.number}.</span>
-                      <span className="clue-text">{w.clue}</span>
+                  {downClues.map((item) => (
+                    <li key={item.id} className="clue-item">
+                      <span className="clue-number">{item.number}.</span>
+                      <span className="clue-text">{item.clue}</span>
                     </li>
                   ))}
                 </ul>
@@ -486,20 +521,9 @@ export default function Crossword({ onBack, data = DEFAULT_CROSSWORD_DATA }) {
           </div>
         </div>
 
-        {/* Feedback Display */}
-        {feedback && (
-          <div className={`dictation-feedback feedback-${feedback.type}`} role="alert">
-            {feedback.message}
-          </div>
-        )}
-
-        {/* Action Button */}
-        <div className="form-actions">
-          <button
-            type="button"
-            className="btn btn-primary btn-check"
-            onClick={handleCheckAnswers}
-          >
+        {/* Action Controls Footer */}
+        <div className="crossword-actions">
+          <button type="button" className="btn btn-primary btn-check" onClick={handleCheckAnswers}>
             Check Answers
           </button>
         </div>

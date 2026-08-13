@@ -40,7 +40,9 @@ const CATEGORIES = [
   { id: 'animals', title: 'Animals', icon: '🐾' }
 ];
 
-export default function DragDrop({ onBack, data }) {
+export default function DragDrop({ onBack, data: propsData }) {
+  const data = propsData || null;
+
   const activeCategories = (data?.content?.dropZones && data.content.dropZones.length > 0)
     ? data.content.dropZones.map((z) => typeof z === 'string'
         ? { id: z.toLowerCase().trim(), title: z.trim(), icon: '📦' }
@@ -82,8 +84,14 @@ export default function DragDrop({ onBack, data }) {
   const roundSortedCount = roundTotalItems - roundAvailableItems.length;
   const isRoundComplete = roundAvailableItems.length === 0;
 
+  // Total game items & max score calculation
+  const totalGameItems = activeRounds.reduce((acc, r) => acc + (r.items ? r.items.length : 0), 0);
+  const maxScore = Math.max(totalGameItems * 10, 10);
+
   // Overall completed count across previous rounds + current round
-  const completedPreviousItems = currentRoundIndex * 3;
+  const completedPreviousItems = activeRounds
+    .slice(0, currentRoundIndex)
+    .reduce((acc, r) => acc + (r.items ? r.items.length : 0), 0);
   const totalCompletedCount = completedPreviousItems + roundSortedCount;
 
   const handleSortAttempt = (item, targetCategoryId) => {
@@ -96,10 +104,11 @@ export default function DragDrop({ onBack, data }) {
       setRoundAvailableItems(remaining);
       setRoundSortedItems((prev) => ({
         ...prev,
-        [targetCategoryId]: [...prev[targetCategoryId], item]
+        [targetCategoryId]: [...(prev[targetCategoryId] || []), item]
       }));
 
-      const categoryLabel = targetCategoryId === 'fruits' ? 'Fruits' : 'Animals';
+      const matchedCat = activeCategories.find((c) => c.id === targetCategoryId);
+      const categoryLabel = matchedCat ? matchedCat.title : targetCategoryId;
 
       if (remaining.length === 0) {
         // Round Complete
@@ -170,8 +179,12 @@ export default function DragDrop({ onBack, data }) {
     if (currentRoundIndex < totalRounds - 1) {
       const nextIndex = currentRoundIndex + 1;
       setCurrentRoundIndex(nextIndex);
-      setRoundAvailableItems(ROUNDS_DATA[nextIndex].items);
-      setRoundSortedItems({ fruits: [], animals: [] });
+      setRoundAvailableItems(activeRounds[nextIndex].items);
+      const resetSorted = {};
+      activeCategories.forEach((cat) => {
+        resetSorted[cat.id] = [];
+      });
+      setRoundSortedItems(resetSorted);
       setFeedback(null);
       setSelectedItem(null);
       setDraggedItem(null);
@@ -182,8 +195,12 @@ export default function DragDrop({ onBack, data }) {
 
   const handlePlayAgain = () => {
     setCurrentRoundIndex(0);
-    setRoundAvailableItems(ROUNDS_DATA[0].items);
-    setRoundSortedItems({ fruits: [], animals: [] });
+    setRoundAvailableItems(activeRounds[0].items);
+    const resetSorted = {};
+    activeCategories.forEach((cat) => {
+      resetSorted[cat.id] = [];
+    });
+    setRoundSortedItems(resetSorted);
     setScore(0);
     setDraggedItem(null);
     setSelectedItem(null);
@@ -207,7 +224,7 @@ export default function DragDrop({ onBack, data }) {
         <div className="drag-drop-card results-card">
           <div className="result-icon">🎉</div>
           <h1 className="result-title">Amazing!</h1>
-          <p className="result-subtitle">You sorted everything correctly across all 4 rounds!</p>
+          <p className="result-subtitle">You sorted everything correctly across all rounds!</p>
 
           <div className="score-summary-box">
             <div className="score-main">
@@ -268,7 +285,7 @@ export default function DragDrop({ onBack, data }) {
         <div className="progress-bar-track">
           <div
             className="progress-bar-fill"
-            style={{ width: `${(totalCompletedCount / totalGameItems) * 100}%` }}
+            style={{ width: `${Math.min(100, Math.max(0, (totalCompletedCount / Math.max(totalGameItems, 1)) * 100))}%` }}
           ></div>
         </div>
 

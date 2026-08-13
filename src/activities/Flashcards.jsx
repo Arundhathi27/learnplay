@@ -45,6 +45,7 @@ export const DEFAULT_FLASHCARDS_DATA = {
 
 // Helper: Fisher-Yates array shuffle
 function shuffleArray(array) {
+  if (!array || !Array.isArray(array)) return [];
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -53,8 +54,14 @@ function shuffleArray(array) {
   return shuffled;
 }
 
-export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
-  const [cards, setCards] = useState([]);
+export default function Flashcards({ onBack, data: propsData }) {
+  const data = propsData || DEFAULT_FLASHCARDS_DATA;
+  const rawCards = data?.content?.cards || data?.cards || DEFAULT_FLASHCARDS_DATA.cards;
+  const activeSettings = data?.settings || DEFAULT_FLASHCARDS_DATA.settings;
+
+  const [cards, setCards] = useState(() => {
+    return activeSettings?.randomize ? shuffleArray(rawCards) : [...rawCards];
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [userAnswer, setUserAnswer] = useState('');
@@ -67,11 +74,11 @@ export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
 
   // Initialize cards on load / data change
   useEffect(() => {
-    const rawCards = data?.content?.cards || data?.cards || DEFAULT_FLASHCARDS_DATA.cards;
-    const settings = data?.settings || DEFAULT_FLASHCARDS_DATA.settings;
-    const initialCards = settings?.randomize
-      ? shuffleArray(rawCards)
-      : [...rawCards];
+    const freshRawCards = data?.content?.cards || data?.cards || DEFAULT_FLASHCARDS_DATA.cards;
+    const freshSettings = data?.settings || DEFAULT_FLASHCARDS_DATA.settings;
+    const initialCards = freshSettings?.randomize
+      ? shuffleArray(freshRawCards)
+      : [...freshRawCards];
     setCards(initialCards);
     setCurrentIndex(0);
     setShowAnswer(false);
@@ -82,11 +89,10 @@ export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
     setIsCompleted(false);
   }, [data]);
 
-  const currentCard = cards[currentIndex] || {};
+  const currentCard = cards[currentIndex] || cards[0] || {};
   const totalCards = cards.length;
-  const maxScore = totalCards * 10;
+  const maxScore = Math.max(totalCards * 10, 10);
   const isCardAnswered = Boolean(answeredCards[currentIndex]);
-  const activeSettings = data?.settings || DEFAULT_FLASHCARDS_DATA.settings;
 
   // Focus input field when card changes
   useEffect(() => {
@@ -155,9 +161,10 @@ export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
   };
 
   const handlePlayAgain = () => {
-    const freshCards = data.settings?.randomize
-      ? shuffleArray(data.cards)
-      : [...data.cards];
+    const freshRawCards = data?.content?.cards || data?.cards || DEFAULT_FLASHCARDS_DATA.cards;
+    const freshCards = activeSettings?.randomize
+      ? shuffleArray(freshRawCards)
+      : [...freshRawCards];
     setCards(freshCards);
     setCurrentIndex(0);
     setShowAnswer(false);
@@ -219,8 +226,8 @@ export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
         {/* Header Bar */}
         <div className="game-header">
           <div className="activity-title-group">
-            <h1 className="activity-main-title">🎴 Flashcards</h1>
-            <p className="activity-instruction">Test your knowledge card by card.</p>
+            <h1 className="activity-main-title">{data?.title || '🎴 Flashcards'}</h1>
+            <p className="activity-instruction">{data?.description || 'Test your knowledge card by card.'}</p>
           </div>
 
           <div className="game-stats">
@@ -283,7 +290,7 @@ export default function Flashcards({ onBack, data = DEFAULT_FLASHCARDS_DATA }) {
         </div>
 
         {/* Optional User Input Section */}
-        {data.settings?.requireInput && (
+        {activeSettings?.requireInput && (
           <form onSubmit={handleCheckAnswer} className="dictation-form">
             <div className="input-group">
               <label htmlFor="flashcard-input" className="sr-only">
